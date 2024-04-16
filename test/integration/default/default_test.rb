@@ -1,16 +1,6 @@
 # Chef InSpec test for recipe app_add_apt::default
 
-# The Chef InSpec reference, with examples and extensive documentation, can be
-# found at https://docs.chef.io/inspec/resources/
-
-unless os.windows?
-  # This is an example test, replace with your own test.
-  describe user('root'), :skip do
-    it { should exist }
-  end
-end
-
-# This is an example test, replace it with your own test.
-describe port(80), :skip do
-  it { should_not be_listening }
+# Make sure cache update has no errors
+describe command('/usr/bin/apt-get update 2>&1 || echo E: Update failed') do
+  its('stdout') { should_not match /^[WE]:/ }
 end
