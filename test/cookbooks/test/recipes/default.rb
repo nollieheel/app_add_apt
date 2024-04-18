@@ -16,31 +16,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Save node attribs to file
-ruby_block 'save node attribs' do
-  block do
-    ::File.write('/tmp/kitchen_chef_node.json', node.to_json)
-  end
-end
+# # Save node attribs to file
+# ruby_block 'save node attribs' do
+#   block do
+#     ::File.write('/tmp/kitchen_chef_node.json', node.to_json)
+#   end
+# end
 
 vs = node[cookbook_name]
 
 add_apt vs['php-fpm']['name'] do
-  key        vs['php-fpm']['key']
-  uri        vs['php-fpm']['uri']
-  components ['main']
-  arch       'amd64'
+  key          vs['php-fpm']['key']
+  uri          vs['php-fpm']['uri']
+  components   ['main']
+  arch         'amd64'
+  cache_rebuild false
 end
 
 add_apt vs['mariadb']['name'] do
-  keyserver    false
-  key          vs['mariadb']['key']
-  key_name     vs['mariadb']['key_name']
-  key_checksum vs['mariadb']['key_checksum']
-  uri          vs['mariadb']['uri']
-  components   ['main']
-  options      []
-  arch         'amd64'
+  keyserver     false
+  key           vs['mariadb']['key']
+  key_name      vs['mariadb']['key_name']
+  key_checksum  vs['mariadb']['key_checksum']
+  uri           vs['mariadb']['uri']
+  components    ['main']
+  options       []
+  arch          'amd64'
+  cache_rebuild false
 end
 
 add_apt vs['elastic']['name'] do

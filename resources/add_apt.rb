@@ -82,57 +82,57 @@ property :keyrings, String,
 action :install do
   # Get GPG keyring and store in :keyrings directory
 
-  key1 = if property_is_set?(:key_name)
-           new_resource.key_name
-         else
-           "#{new_resource.repo_name}.gpg"
-         end
+  kn = if property_is_set?(:key_name)
+         new_resource.key_name
+       else
+         "#{new_resource.repo_name}.gpg"
+       end
 
   sign = "signed-by=#{new_resource.keyrings}/"
 
   package 'gpg'
 
   if new_resource.keyserver
-    execute "get_key_from_keyserver_#{key1}" do
+    execute "get_key_from_keyserver_#{kn}" do
       command 'gpg --homedir /tmp --no-default-keyring '\
-              "--keyring #{new_resource.keyrings}/#{key1} "\
+              "--keyring #{new_resource.keyrings}/#{kn} "\
               "--keyserver #{new_resource.keyserver} "\
               "--recv-keys #{new_resource.key}"
-      not_if  { ::File.exist?("#{new_resource.keyrings}/#{key1}") }
+      not_if  { ::File.exist?("#{new_resource.keyrings}/#{kn}") }
     end
 
-    sign << "#{key1}"
+    sign << "#{kn}"
 
   elsif new_resource.key.start_with?('http')
-    locarmored   = "#{Chef::Config[:file_cache_path]}/#{key1}"
-    locunarmored = "#{new_resource.keyrings}/#{key1}"
+    locarmored   = "#{Chef::Config[:file_cache_path]}/#{kn}"
+    locunarmored = "#{new_resource.keyrings}/#{kn}"
 
     if new_resource.key_dearmor
       remote_file locarmored do
         source   new_resource.key
         not_if   { ::File.exist?(locunarmored) }
-        notifies :run, "execute[dearmor_#{key1}]", :immediately
+        notifies :run, "execute[dearmor_#{kn}]", :immediately
         if new_resource.key_checksum
           checksum new_resource.key_checksum
         end
       end
 
-      execute "dearmor_#{key1}" do
+      execute "dearmor_#{kn}" do
         command "gpg --dearmor -o #{locunarmored} #{locarmored}"
         action  :nothing
       end
 
     else
       remote_file locunarmored do
-        action   :create_if_missing
-        source   new_resource.key
+        action :create_if_missing
+        source new_resource.key
         if new_resource.key_checksum
           checksum new_resource.key_checksum
         end
       end
     end
 
-    sign << "#{key1}"
+    sign << "#{kn}"
 
   else
     cookbook_file "#{new_resource.keyrings}/#{new_resource.key}" do
@@ -147,11 +147,7 @@ action :install do
 
   # Add repo in sources.list.d
 
-  opts = if new_resource.options.is_a?(String)
-           [sign, new_resource.options]
-         else
-           ([sign] + new_resource.options).flatten
-         end
+  opts = [sign, new_resource.options].flatten
 
   apt_repository new_resource.repo_name do
     if new_resource.property_is_set?(:arch)
