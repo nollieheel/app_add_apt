@@ -31,7 +31,8 @@ property :cache_rebuild, [true, false],
          description: 'See apt_repository resource'
 
 property :components, [Array],
-         description: 'See apt_repository resource'
+         description: 'Must be provided explicitly. '\
+                      'Otherwise, see apt_repository resource.'
 
 property :cookbook, [String, false],
          description: 'See apt_repository resource'

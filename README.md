@@ -31,13 +31,13 @@ The following properties work the same as they do in `apt_repository`:
 - `repo_name`
 - `arch`
 - `cache_rebuild`
-- `components`
 - `cookbook`
 - `deb_src`
 - `distribution`
 - `keyserver`
 
 New properties or existing ones that now work a bit differently:
+- `components` - Now defaults to `[]`.
 - `key` - Same as in `apt_repository`, but only accepts a single string.
 - `key_name` - If you want the key file to be named other than `:repo_name` by default.
 - `key_checksum` - Optional. SHA256 checksum of downloaded raw key.
